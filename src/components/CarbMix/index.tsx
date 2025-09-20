@@ -23,6 +23,7 @@ function round(v: number) {
 
 const CarbMix: React.FC = () => {
   const [carbs, setCarbs] = useState<number>(30);
+  const [saltMgPerPouch, setSaltMgPerPouch] = useState<number>(0);
 
   const results = useMemo(() => {
     const scale = carbs / BASE_CARBS;
@@ -35,18 +36,24 @@ const CarbMix: React.FC = () => {
     // Approximate solids volume by treating grams ~= ml
     const solidsVolume = malt + f60; // ml approximation
 
-    // Total ml yield ~= solidsVolume + lemon + waterBase
-    const totalMl = solidsVolume + lemon + waterBase;
+    const saltMg = saltMgPerPouch * scale;
+
+    // Convert salt (mg) to ml approximation (assume 1 g ~= 1 ml)
+    const saltMl = saltMg / 1000;
+
+    // Total ml yield ~= solidsVolume + lemon + waterBase + saltMl
+    const totalMl = solidsVolume + lemon + waterBase + saltMl;
 
     return {
       malt: round(malt),
       f60: round(f60),
       lemon: round(lemon),
       water: round(waterBase),
+      saltMg: Math.round(saltMg * 100) / 100,
       totalMl: round(totalMl),
       scale: round(scale),
     };
-  }, [carbs]);
+  }, [carbs, saltMgPerPouch]);
 
   return (
     <div>
@@ -61,6 +68,14 @@ const CarbMix: React.FC = () => {
             value={carbs}
             onChange={(v) => setCarbs(typeof v === "number" ? v : 0)}
             addonAfter="g carbs"
+          />
+          <Text>Optional: Salt per pouch (mg)</Text>
+          <InputNumber
+            min={0}
+            step={10}
+            value={saltMgPerPouch}
+            onChange={(v) => setSaltMgPerPouch(typeof v === "number" ? v : 0)}
+            addonAfter="mg"
           />
           <Text type="secondary">
             Base pouch = 30 g carbs. Results scale from that pouch.
@@ -107,6 +122,16 @@ const CarbMix: React.FC = () => {
             <div className={styles.filler} />
             <div className={styles.value}>
               <Text>{results.water} ml</Text>
+            </div>
+          </div>
+
+          <div className={styles.tocLine}>
+            <div className={styles.label}>
+              <Text strong>Salt (table)</Text>
+            </div>
+            <div className={styles.filler} />
+            <div className={styles.value}>
+              <Text>{results.saltMg ?? 0} mg</Text>
             </div>
           </div>
         </div>

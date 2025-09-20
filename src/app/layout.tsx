@@ -11,7 +11,7 @@ const noto = Noto_Sans_Display({
 });
 
 export const metadata = {
-  title: 'Triathlon Tools',
+  title: "Triathlon Tools",
 };
 
 const RootLayout = ({ children }: React.PropsWithChildren) => (
