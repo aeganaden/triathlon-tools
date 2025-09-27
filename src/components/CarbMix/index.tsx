@@ -44,8 +44,9 @@ const CarbMix: React.FC = () => {
     // table salt mass in mg needed to supply the desired sodium
     const saltTotalMg = SODIUM_FRACTION > 0 ? sodiumMg / SODIUM_FRACTION : 0;
 
-    // Convert salt (mg) to ml approximation (assume 1 g ~= 1 ml)
-    const saltMl = saltTotalMg / 1000;
+    // Convert salt (mg) to grams and ml approximation (assume 1 g ~= 1 ml)
+    const saltG = saltTotalMg / 1000;
+    const saltMl = saltG; // 1 g ~= 1 ml approximation
 
     // Total ml yield ~= solidsVolume + lemon + waterBase + saltMl
     const totalMl = solidsVolume + lemon + waterBase + saltMl;
@@ -57,6 +58,8 @@ const CarbMix: React.FC = () => {
       water: round(waterBase),
       // saltMg is the computed table salt (NaCl) in mg
       saltMg: Math.round(saltTotalMg * 100) / 100,
+      // saltG is the computed table salt in grams (for UI display)
+      saltG: Math.round(saltG * 100) / 100,
       // sodiumMg is the requested sodium input (mg)
       sodiumMg: Math.round(sodiumMg * 100) / 100,
       totalMl: round(totalMl),
@@ -150,7 +153,7 @@ const CarbMix: React.FC = () => {
             </div>
             <div className={styles.filler} />
             <div className={styles.value}>
-              <Text>{results.saltMg ?? 0} mg</Text>
+              <Text>{results.saltG ?? 0} g</Text>
             </div>
           </div>
         </div>
