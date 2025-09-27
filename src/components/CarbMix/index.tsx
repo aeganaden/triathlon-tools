@@ -23,7 +23,9 @@ function round(v: number) {
 
 const CarbMix: React.FC = () => {
   const [carbs, setCarbs] = useState<number>(30);
-  const [saltMgPerPouch, setSaltMgPerPouch] = useState<number>(0);
+  // Sodium entered as a total for the whole mix (mg). We compute table salt (NaCl)
+  // required to provide that sodium amount and show the salt amount in results.
+  const [sodiumMg, setSodiumMg] = useState<number>(0);
 
   const results = useMemo(() => {
     const scale = carbs / BASE_CARBS;
@@ -36,10 +38,14 @@ const CarbMix: React.FC = () => {
     // Approximate solids volume by treating grams ~= ml
     const solidsVolume = malt + f60; // ml approximation
 
-    const saltMg = saltMgPerPouch * scale;
+    // Convert sodium (mg) to table salt (NaCl) amount.
+    // Na atomic mass = 22.98976928, Cl = 35.453 -> Na fraction of NaCl by mass:
+    const SODIUM_FRACTION = 22.98976928 / (22.98976928 + 35.453);
+    // table salt mass in mg needed to supply the desired sodium
+    const saltTotalMg = SODIUM_FRACTION > 0 ? sodiumMg / SODIUM_FRACTION : 0;
 
     // Convert salt (mg) to ml approximation (assume 1 g ~= 1 ml)
-    const saltMl = saltMg / 1000;
+    const saltMl = saltTotalMg / 1000;
 
     // Total ml yield ~= solidsVolume + lemon + waterBase + saltMl
     const totalMl = solidsVolume + lemon + waterBase + saltMl;
@@ -49,11 +55,14 @@ const CarbMix: React.FC = () => {
       f60: round(f60),
       lemon: round(lemon),
       water: round(waterBase),
-      saltMg: Math.round(saltMg * 100) / 100,
+      // saltMg is the computed table salt (NaCl) in mg
+      saltMg: Math.round(saltTotalMg * 100) / 100,
+      // sodiumMg is the requested sodium input (mg)
+      sodiumMg: Math.round(sodiumMg * 100) / 100,
       totalMl: round(totalMl),
       scale: round(scale),
     };
-  }, [carbs, saltMgPerPouch]);
+  }, [carbs, sodiumMg]);
 
   return (
     <div>
@@ -69,12 +78,12 @@ const CarbMix: React.FC = () => {
             onChange={(v) => setCarbs(typeof v === "number" ? v : 0)}
             addonAfter="g carbs"
           />
-          <Text>Optional: Salt per pouch (mg)</Text>
+          <Text>Optional: Desired sodium for whole mix (mg)</Text>
           <InputNumber
             min={0}
             step={10}
-            value={saltMgPerPouch}
-            onChange={(v) => setSaltMgPerPouch(typeof v === "number" ? v : 0)}
+            value={sodiumMg}
+            onChange={(v) => setSodiumMg(typeof v === "number" ? v : 0)}
             addonAfter="mg"
           />
           <Text type="secondary">
@@ -127,7 +136,17 @@ const CarbMix: React.FC = () => {
 
           <div className={styles.tocLine}>
             <div className={styles.label}>
-              <Text strong>Salt (table)</Text>
+              <Text strong>Sodium (requested)</Text>
+            </div>
+            <div className={styles.filler} />
+            <div className={styles.value}>
+              <Text>{results.sodiumMg ?? 0} mg</Text>
+            </div>
+          </div>
+
+          <div className={styles.tocLine}>
+            <div className={styles.label}>
+              <Text strong>Salt (table) required</Text>
             </div>
             <div className={styles.filler} />
             <div className={styles.value}>
