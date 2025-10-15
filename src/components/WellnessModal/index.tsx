@@ -127,6 +127,8 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
                   ? "bg-yellow-500"
                   : readinessScore.color === "orange"
                   ? "bg-orange-500"
+                  : readinessScore.color === "purple"
+                  ? "bg-purple-500"
                   : "bg-red-500"
               }`}
             />
@@ -175,6 +177,8 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
                         ? "text-yellow-600"
                         : readinessScore.color === "orange"
                         ? "text-orange-600"
+                        : readinessScore.color === "purple"
+                        ? "text-purple-600"
                         : "text-red-600"
                     }`}
                   >
@@ -315,6 +319,8 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
                       ? "bg-yellow-50 border border-yellow-200"
                       : readinessScore.color === "orange"
                       ? "bg-orange-50 border border-orange-200"
+                      : readinessScore.color === "purple"
+                      ? "bg-purple-50 border border-purple-200"
                       : "bg-red-50 border border-red-200"
                   }`}
                 >
@@ -348,7 +354,20 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
                   </thead>
                   <tbody>
                     <tr className="border-b">
-                      <td className="p-2 font-medium">80-100%</td>
+                      <td className="p-2 font-medium">105%+</td>
+                      <td className="p-2">
+                        <span className="inline-flex items-center gap-2">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                          Supercompensated
+                        </span>
+                      </td>
+                      <td className="p-2">Peak/race ready</td>
+                      <td className="p-2">
+                        Breakthrough workouts, competitions, PRs
+                      </td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-2 font-medium">95-104%</td>
                       <td className="p-2">
                         <span className="inline-flex items-center gap-2">
                           <div className="w-3 h-3 bg-green-500 rounded-full"></div>
@@ -361,38 +380,49 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
                       </td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-2 font-medium">60-79%</td>
+                      <td className="p-2 font-medium">85-94%</td>
+                      <td className="p-2">
+                        <span className="inline-flex items-center gap-2">
+                          <div className="w-3 h-3 bg-lime-500 rounded-full"></div>
+                          Good Readiness
+                        </span>
+                      </td>
+                      <td className="p-2">Moderate intensity</td>
+                      <td className="p-2">Tempo, sustained efforts</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-2 font-medium">70-84%</td>
                       <td className="p-2">
                         <span className="inline-flex items-center gap-2">
                           <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                           Moderate Readiness
                         </span>
                       </td>
-                      <td className="p-2">Tempo or aerobic training</td>
+                      <td className="p-2">Aerobic base</td>
                       <td className="p-2">
-                        Moderate intensity, threshold work
+                        Easy aerobic training, base building
                       </td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-2 font-medium">40-59%</td>
+                      <td className="p-2 font-medium">50-69%</td>
                       <td className="p-2">
                         <span className="inline-flex items-center gap-2">
                           <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
                           Low Readiness
                         </span>
                       </td>
-                      <td className="p-2">Light recovery training</td>
+                      <td className="p-2">Light recovery</td>
                       <td className="p-2">Easy pace, low stress activities</td>
                     </tr>
                     <tr>
-                      <td className="p-2 font-medium">0-39%</td>
+                      <td className="p-2 font-medium">0-49%</td>
                       <td className="p-2">
                         <span className="inline-flex items-center gap-2">
                           <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                           Very Low Readiness
                         </span>
                       </td>
-                      <td className="p-2">Rest or full recovery</td>
+                      <td className="p-2">Rest day</td>
                       <td className="p-2">
                         Complete rest, sleep, stress management
                       </td>

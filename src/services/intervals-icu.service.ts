@@ -456,18 +456,18 @@ export class IntervalsIcuService {
       .map((d) => d.hrv)
       .filter((v): v is number => v !== undefined && v !== null && v > 0);
     const HRV_base =
-      hrvValues.length > 0
+      hrvValues.length >= 3 // Need at least 3 data points for reliable baseline
         ? hrvValues.reduce((sum, val) => sum + val, 0) / hrvValues.length
-        : 1; // Avoid division by zero
+        : 0; // No reliable baseline available
 
     // RHR baseline: average of last 30 non-zero restingHR values
     const rhrValues = recentData
       .map((d) => d.restingHR)
       .filter((v): v is number => v !== undefined && v !== null && v > 0);
     const RHR_base =
-      rhrValues.length > 0
+      rhrValues.length >= 3 // Need at least 3 data points for reliable baseline
         ? rhrValues.reduce((sum, val) => sum + val, 0) / rhrValues.length
-        : 1; // Avoid division by zero
+        : 0; // No reliable baseline available
 
     // Sleep target: average of last 30 sleep values converted to hours
     const sleepValues = recentData
@@ -477,41 +477,111 @@ export class IntervalsIcuService {
       })
       .filter((v) => v > 0);
     const Sleep_target =
-      sleepValues.length > 0
+      sleepValues.length >= 3 // Need at least 3 data points for reliable baseline
         ? sleepValues.reduce((sum, val) => sum + val, 0) / sleepValues.length
-        : 8; // Default to 8 hours
+        : 0; // No reliable baseline available
 
-    // Normalize today's metrics
-    const HRV_s = Math.min(100, Math.max(0, 100 * (HRV_today / HRV_base)));
-    const RHR_s = Math.min(
-      100,
-      Math.max(0, 100 * (RHR_base / (RHR_today || RHR_base)))
-    );
-    const Sleep_s = Math.min(
-      100,
-      Math.max(0, 100 * (Sleep_today / 3600 / Sleep_target))
-    );
+    // Normalize today's metrics with proper handling of missing/zero values
+    // Allow scores to go above 100 but cap at reasonable limits to avoid extreme outliers
+    const HRV_s =
+      HRV_today > 0 && HRV_base > 0
+        ? Math.min(150, Math.max(0, 100 * (HRV_today / HRV_base)))
+        : 0; // If no HRV data, score is 0
 
-    // Compute final readiness score
-    const readiness = 0.5 * HRV_s + 0.25 * RHR_s + 0.25 * Sleep_s;
+    const RHR_s =
+      RHR_today > 0 && RHR_base > 0
+        ? Math.min(150, Math.max(0, 100 * (RHR_base / RHR_today)))
+        : 0; // If no RHR data, score is 0
+
+    const Sleep_s =
+      Sleep_today > 0 && Sleep_target > 0
+        ? Math.min(150, Math.max(0, 100 * (Sleep_today / 3600 / Sleep_target)))
+        : 0; // If no sleep data, score is 0
+
+    // Compute final readiness score with weighting based on available data
+    const hasHRV = HRV_s > 0;
+    const hasRHR = RHR_s > 0;
+    const hasSleep = Sleep_s > 0;
+
+    // Calculate weighted readiness based on available metrics
+    // Apply diminishing returns for scores above 100 to make readiness more realistic
+    let readiness = 0;
+    let totalWeight = 0;
+
+    if (hasHRV) {
+      // Apply diminishing returns: scores above 100 contribute less
+      const hrvContribution = HRV_s > 100 ? 100 + (HRV_s - 100) * 0.5 : HRV_s;
+      readiness += 0.5 * hrvContribution;
+      totalWeight += 0.5;
+    }
+    if (hasRHR) {
+      // Apply diminishing returns: scores above 100 contribute less
+      const rhrContribution = RHR_s > 100 ? 100 + (RHR_s - 100) * 0.5 : RHR_s;
+      readiness += 0.25 * rhrContribution;
+      totalWeight += 0.25;
+    }
+    if (hasSleep) {
+      // Apply diminishing returns: scores above 100 contribute less
+      const sleepContribution =
+        Sleep_s > 100 ? 100 + (Sleep_s - 100) * 0.5 : Sleep_s;
+      readiness += 0.25 * sleepContribution;
+      totalWeight += 0.25;
+    }
+
+    // Normalize by actual weight (avoid division by zero)
+    if (totalWeight > 0) {
+      readiness = readiness / totalWeight;
+      // Don't cap the final readiness - let it reflect true state
+      // Values above 100 indicate supercompensation/peak readiness
+    } else {
+      readiness = 0; // No data available
+    }
 
     // Determine color and status based on readiness zones
     let color: string;
     let status: string;
 
-    if (readiness >= 80) {
+    if (totalWeight === 0) {
+      color = "gray";
+      status = "Insufficient data for readiness calculation";
+    } else if (readiness >= 105) {
+      color = "purple";
+      status = "Supercompensated (peak/race ready)";
+    } else if (readiness >= 95) {
       color = "green";
       status = "High readiness (train hard)";
-    } else if (readiness >= 60) {
+    } else if (readiness >= 85) {
+      color = "lightgreen";
+      status = "Good readiness (moderate intensity)";
+    } else if (readiness >= 70) {
       color = "yellow";
-      status = "Moderate readiness (tempo or aerobic)";
-    } else if (readiness >= 40) {
+      status = "Moderate readiness (aerobic base)";
+    } else if (readiness >= 50) {
       color = "orange";
       status = "Low readiness (light recovery)";
     } else {
       color = "red";
-      status = "Very low readiness (rest or full recovery)";
+      status = "Very low readiness (rest day)";
     }
+
+    // Debug logging to help troubleshoot
+    console.log("Readiness Calculation Debug:", {
+      HRV_today,
+      HRV_base,
+      HRV_s,
+      RHR_today,
+      RHR_base,
+      RHR_s,
+      Sleep_today: Sleep_today / 3600, // Convert to hours
+      Sleep_target,
+      Sleep_s,
+      hasHRV,
+      hasRHR,
+      hasSleep,
+      totalWeight,
+      finalReadiness: readiness,
+      dataPoints: wellnessData.length,
+    });
 
     return {
       score: Math.round(readiness * 10) / 10, // Round to 1 decimal place
@@ -530,5 +600,113 @@ export class IntervalsIcuService {
         finalScore: readiness,
       },
     };
+  }
+
+  /**
+   * Calculate Form (CTL - ATL) from wellness data
+   * @param wellnessData Array of daily wellness objects with ctl and atl values
+   * @returns Object with form value, color, zone, and detailed interpretation
+   */
+  static calculateForm(wellnessData: IntervalsWellnessData[]): {
+    form: number;
+    color: string;
+    zone: string;
+    meaning: string;
+    trend: Array<{
+      date: string;
+      form: number;
+      ctl: number;
+      atl: number;
+    }>;
+  } {
+    if (!wellnessData || wellnessData.length === 0) {
+      return {
+        form: 0,
+        color: "gray",
+        zone: "No Data",
+        meaning: "Insufficient data to calculate form",
+        trend: [],
+      };
+    }
+
+    // Get the most recent entry with CTL and ATL data
+    const today = wellnessData[wellnessData.length - 1];
+    const currentCTL = today.ctl || 0;
+    const currentATL = today.atl || 0;
+    const currentForm = currentCTL - currentATL;
+
+    // Generate trend data for the last 30 days
+    const trendData = wellnessData
+      .slice(-30)
+      .filter((d) => d.ctl !== undefined && d.atl !== undefined)
+      .map((d) => ({
+        date: d.id,
+        form: (d.ctl || 0) - (d.atl || 0),
+        ctl: d.ctl || 0,
+        atl: d.atl || 0,
+      }));
+
+    // Determine zone and color based on form value
+    let color: string;
+    let zone: string;
+    let meaning: string;
+
+    if (currentForm > 5) {
+      color = "yellow";
+      zone = "Transition / Fresh";
+      meaning =
+        "Low load or taper period. Very fresh, but may lose fitness if sustained. Ideal before races.";
+    } else if (currentForm >= 0) {
+      color = "blue";
+      zone = "Fresh";
+      meaning = "Well-recovered. Ideal for high-intensity or key workouts.";
+    } else if (currentForm >= -10) {
+      color = "gray";
+      zone = "Grey Zone";
+      meaning =
+        "Maintenance level. Balanced fatigue and fitness. Progress may stagnate.";
+    } else if (currentForm >= -30) {
+      color = "green";
+      zone = "Optimal";
+      meaning =
+        "Productive training load. Good stress–recovery balance for long-term gains.";
+    } else {
+      color = "red";
+      zone = "High Risk";
+      meaning =
+        "Excessive fatigue. Recovery or deload required. Risk of overreaching.";
+    }
+
+    // Debug logging
+    console.log("Form Calculation Debug:", {
+      currentCTL,
+      currentATL,
+      currentForm,
+      zone,
+      dataPoints: wellnessData.length,
+    });
+
+    return {
+      form: Math.round(currentForm * 10) / 10, // Round to 1 decimal place
+      color,
+      zone,
+      meaning,
+      trend: trendData,
+    };
+  }
+
+  /**
+   * Get most recent form data
+   */
+  static async getMostRecentForm(): Promise<ReturnType<
+    typeof IntervalsIcuService.calculateForm
+  > | null> {
+    try {
+      const wellnessData = await this.getWellnessData();
+      return wellnessData.length > 0 ? this.calculateForm(wellnessData) : null;
+    } catch (error) {
+      console.error("Error fetching most recent form data:", error);
+      throw error;
+    }
   }
 }
