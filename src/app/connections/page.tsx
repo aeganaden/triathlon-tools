@@ -169,42 +169,44 @@ const Connections = () => {
 
       {/* Connection Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[425px] overflow-hidden flex flex-col">
+          <DialogHeader className="sticky top-0 z-10 bg-background border-b pb-4">
             <DialogTitle>Connect to intervals.icu</DialogTitle>
             <DialogDescription>
               Enter your API key and Athlete ID to connect your intervals.icu
               account.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="api-key" className="text-right">
-                API Key
-              </Label>
-              <Input
-                id="api-key"
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter your API key"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="athlete-id" className="text-right">
-                Athlete ID
-              </Label>
-              <Input
-                id="athlete-id"
-                value={athleteId}
-                onChange={(e) => setAthleteId(e.target.value)}
-                className="col-span-3"
-                placeholder="Enter your Athlete ID"
-              />
+          <div className="flex-1 overflow-y-auto pt-4">
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="api-key" className="text-right">
+                  API Key
+                </Label>
+                <Input
+                  id="api-key"
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  className="col-span-3"
+                  placeholder="Enter your API key"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="athlete-id" className="text-right">
+                  Athlete ID
+                </Label>
+                <Input
+                  id="athlete-id"
+                  value={athleteId}
+                  onChange={(e) => setAthleteId(e.target.value)}
+                  className="col-span-3"
+                  placeholder="Enter your Athlete ID"
+                />
+              </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="sticky bottom-0 z-10 bg-background border-t pt-4">
             <Button variant="outline" onClick={handleClose}>
               Close
             </Button>

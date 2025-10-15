@@ -154,4 +154,33 @@ export const formColorUtils = {
         return "bg-gray-50 border border-gray-200";
     }
   },
+
+  // Get area chart color based on form value
+  getAreaChartColor: (formValue: number): { stroke: string; fill: string } => {
+    if (formValue > 5) {
+      // Transition / Fresh zone
+      return { stroke: "#eab308", fill: "#eab308" }; // Yellow
+    } else if (formValue >= 0) {
+      // Fresh zone
+      return { stroke: "#3b82f6", fill: "#3b82f6" }; // Blue
+    } else if (formValue >= -10) {
+      // Grey zone
+      return { stroke: "#6b7280", fill: "#6b7280" }; // Gray
+    } else if (formValue >= -30) {
+      // Optimal zone
+      return { stroke: "#22c55e", fill: "#22c55e" }; // Green
+    } else {
+      // High Risk zone
+      return { stroke: "#ef4444", fill: "#ef4444" }; // Red
+    }
+  },
+
+  // Get zone color for a specific form value (used for data points)
+  getZoneColor: (formValue: number): string => {
+    if (formValue > 5) return "yellow";
+    if (formValue >= 0) return "blue";
+    if (formValue >= -10) return "gray";
+    if (formValue >= -30) return "green";
+    return "red";
+  },
 };

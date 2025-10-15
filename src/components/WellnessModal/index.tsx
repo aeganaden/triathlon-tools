@@ -117,8 +117,8 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="sticky top-0 z-10 bg-background border-b pb-4">
           <DialogTitle className="flex items-center gap-2">
             <div
               className={`w-3 h-3 rounded-full ${readinessColorUtils.getIndicatorClass(
@@ -129,7 +129,7 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto space-y-6 pt-4">
           {/* Final Score Summary */}
           <Card>
             <CardHeader>

@@ -10,13 +10,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formColorUtils } from "@/lib/utils";
 import {
   Area,
-  AreaChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
   ReferenceLine,
+  ComposedChart,
+  Line,
 } from "recharts";
 
 interface FormModalProps {
@@ -37,6 +38,41 @@ interface FormModalProps {
 }
 
 const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
+  // Add zone colors to trend data and calculate dominant zone color
+  const trendWithColors = formData.trend.map((point) => ({
+    ...point,
+    zoneColor: formColorUtils.getZoneColor(point.form),
+    strokeColor: formColorUtils.getAreaChartColor(point.form).stroke,
+    fillColor: formColorUtils.getAreaChartColor(point.form).fill,
+  }));
+
+  // Get the current form zone color for the area
+  const currentFormColors = formColorUtils.getAreaChartColor(formData.form);
+
+  // Custom dot component for zone-colored points
+  const ZoneColoredDot = (props: {
+    cx?: number;
+    cy?: number;
+    payload?: { form: number; date: string; ctl: number; atl: number };
+  }) => {
+    const { cx, cy, payload } = props;
+    if (payload && cx !== undefined && cy !== undefined) {
+      const colors = formColorUtils.getAreaChartColor(payload.form);
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={4}
+          fill={colors.fill}
+          stroke={colors.stroke}
+          strokeWidth={2}
+          opacity={0.8}
+        />
+      );
+    }
+    return <circle cx={cx || 0} cy={cy || 0} r={0} fill="transparent" />;
+  };
+
   // Custom tooltip for the chart
   const CustomTooltip = ({
     active,
@@ -69,8 +105,8 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="sticky top-0 z-10 bg-background border-b pb-4">
           <DialogTitle className="flex items-center gap-2">
             <div
               className={`w-3 h-3 rounded-full ${formColorUtils.getIndicatorClass(
@@ -81,7 +117,7 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="flex-1 overflow-y-auto space-y-6 pt-4">
           {/* Current Form Status */}
           <Card>
             <CardHeader>
@@ -132,8 +168,8 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
             <CardContent>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={formData.trend}
+                  <ComposedChart
+                    data={trendWithColors}
                     margin={{
                       top: 20,
                       right: 30,
@@ -175,15 +211,62 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
                       strokeDasharray="2 2"
                     />
 
+                    {/* Area with current form zone color */}
                     <Area
                       type="monotone"
                       dataKey="form"
-                      stroke="#8884d8"
-                      fill="#8884d8"
+                      stroke={currentFormColors.stroke}
+                      fill={currentFormColors.fill}
                       fillOpacity={0.3}
-                      strokeWidth={2}
+                      strokeWidth={3}
+                      dot={false}
                     />
-                  </AreaChart>
+
+                    {/* Line with zone-colored dots */}
+                    <Line
+                      type="monotone"
+                      dataKey="form"
+                      stroke="transparent"
+                      strokeWidth={0}
+                      dot={ZoneColoredDot}
+                      activeDot={(props: {
+                        cx?: number;
+                        cy?: number;
+                        payload?: {
+                          form: number;
+                          date: string;
+                          ctl: number;
+                          atl: number;
+                        };
+                      }) => {
+                        const { cx, cy, payload } = props;
+                        if (payload && cx !== undefined && cy !== undefined) {
+                          const colors = formColorUtils.getAreaChartColor(
+                            payload.form
+                          );
+                          return (
+                            <circle
+                              cx={cx}
+                              cy={cy}
+                              r={6}
+                              fill={colors.fill}
+                              stroke={colors.stroke}
+                              strokeWidth={3}
+                              opacity={1}
+                            />
+                          );
+                        }
+                        return (
+                          <circle
+                            cx={cx || 0}
+                            cy={cy || 0}
+                            r={6}
+                            fill="#8884d8"
+                          />
+                        );
+                      }}
+                    />
+                  </ComposedChart>
                 </ResponsiveContainer>
               </div>
 
