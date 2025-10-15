@@ -24,11 +24,12 @@ const RootLayout = ({ children }: React.PropsWithChildren) => (
         <ConfigProvider
           theme={{
             token: {
-              colorPrimary: "#03045e",
+              colorPrimary: "#054a91",
+              colorBgBase: "#dbe4ee",
             },
             components: {
               Layout: {
-                headerBg: "#03045e",
+                headerBg: "#054a91",
               },
             },
           }}

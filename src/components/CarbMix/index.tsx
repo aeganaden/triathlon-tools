@@ -69,7 +69,9 @@ const CarbMix: React.FC = () => {
 
   return (
     <div>
-      <Title level={5}>Carb Mix Measurement</Title>
+      <Title level={5} style={{ textAlign: "center" }}>
+        Carb Mix Measurement
+      </Title>
 
       <Card style={{ marginBottom: 16 }}>
         <Space direction="vertical" style={{ width: "100%" }}>
