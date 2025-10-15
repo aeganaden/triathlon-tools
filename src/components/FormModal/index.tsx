@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formColorUtils } from "@/lib/utils";
 import {
   Area,
   AreaChart,
@@ -72,17 +73,9 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div
-              className={`w-3 h-3 rounded-full ${
-                formData.color === "yellow"
-                  ? "bg-yellow-500"
-                  : formData.color === "blue"
-                  ? "bg-blue-500"
-                  : formData.color === "gray"
-                  ? "bg-gray-500"
-                  : formData.color === "green"
-                  ? "bg-green-500"
-                  : "bg-red-500"
-              }`}
+              className={`w-3 h-3 rounded-full ${formColorUtils.getIndicatorClass(
+                formData.color
+              )}`}
             />
             Form Analysis (CTL - ATL) - Current: {formData.form.toFixed(1)}
           </DialogTitle>
@@ -99,17 +92,9 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
             <CardContent>
               <div className="text-center pb-4 w-full flex justify-center">
                 <div
-                  className={`p-4 rounded-lg w-3/5 ${
-                    formData.color === "yellow"
-                      ? "bg-yellow-50 border border-yellow-200"
-                      : formData.color === "blue"
-                      ? "bg-blue-50 border border-blue-200"
-                      : formData.color === "gray"
-                      ? "bg-gray-50 border border-gray-200"
-                      : formData.color === "green"
-                      ? "bg-green-50 border border-green-200"
-                      : "bg-red-50 border border-red-200"
-                  }`}
+                  className={`p-4 rounded-lg w-3/5 ${formColorUtils.getBackgroundClass(
+                    formData.color
+                  )}`}
                 >
                   <div className="text-sm font-medium">{formData.meaning}</div>
                 </div>
@@ -117,17 +102,9 @@ const FormModal: React.FC<FormModalProps> = ({ isOpen, onClose, formData }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                 <div className="text-center">
                   <div
-                    className={`text-3xl font-bold ${
-                      formData.color === "yellow"
-                        ? "text-yellow-600"
-                        : formData.color === "blue"
-                        ? "text-blue-600"
-                        : formData.color === "gray"
-                        ? "text-gray-600"
-                        : formData.color === "green"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
+                    className={`text-3xl font-bold ${formColorUtils.getTextClass(
+                      formData.color
+                    )}`}
                   >
                     {formData.form.toFixed(1)}
                   </div>

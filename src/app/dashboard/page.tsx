@@ -10,6 +10,7 @@ import {
   IntervalsIcuService,
   IntervalsWellnessData,
 } from "@/services/intervals-icu.service";
+import { readinessColorUtils, formColorUtils } from "@/lib/utils";
 
 const Dashboard = () => {
   const [readinessData, setReadinessData] = useState<{
@@ -102,20 +103,9 @@ const Dashboard = () => {
   };
 
   // Helper function to get readiness color
-  const getReadinessColor = ():
-    | "green"
-    | "yellow"
-    | "orange"
-    | "red"
-    | "purple"
-    | "default" => {
+  const getReadinessColor = () => {
     if (!readinessData) return "default";
-    return readinessData.color as
-      | "green"
-      | "yellow"
-      | "orange"
-      | "red"
-      | "purple";
+    return readinessColorUtils.getCardColor(readinessData.color);
   };
 
   // Helper function to get form content display
@@ -135,24 +125,9 @@ const Dashboard = () => {
   };
 
   // Helper function to get form color
-  const getFormColor = ():
-    | "green"
-    | "yellow"
-    | "orange"
-    | "red"
-    | "lightgreen"
-    | "blue"
-    | "gray"
-    | "default" => {
+  const getFormColor = () => {
     if (!formData) return "default";
-    return formData.color as
-      | "green"
-      | "yellow"
-      | "orange"
-      | "red"
-      | "lightgreen"
-      | "blue"
-      | "gray";
+    return formColorUtils.getCardColor(formData.color);
   };
 
   // Handle clicking on the recovery card

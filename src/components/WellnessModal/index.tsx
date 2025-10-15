@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { IntervalsWellnessData } from "@/services/intervals-icu.service";
+import { readinessColorUtils } from "@/lib/utils";
 
 interface WellnessModalProps {
   isOpen: boolean;
@@ -120,17 +121,9 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <div
-              className={`w-3 h-3 rounded-full ${
-                readinessScore.color === "green"
-                  ? "bg-green-500"
-                  : readinessScore.color === "yellow"
-                  ? "bg-yellow-500"
-                  : readinessScore.color === "orange"
-                  ? "bg-orange-500"
-                  : readinessScore.color === "purple"
-                  ? "bg-purple-500"
-                  : "bg-red-500"
-              }`}
+              className={`w-3 h-3 rounded-full ${readinessColorUtils.getIndicatorClass(
+                readinessScore.color
+              )}`}
             />
             Recovery Score Breakdown - {readinessScore.score}%
           </DialogTitle>
@@ -170,17 +163,9 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
                 </div>
                 <div>
                   <div
-                    className={`text-3xl font-bold ${
-                      readinessScore.color === "green"
-                        ? "text-green-600"
-                        : readinessScore.color === "yellow"
-                        ? "text-yellow-600"
-                        : readinessScore.color === "orange"
-                        ? "text-orange-600"
-                        : readinessScore.color === "purple"
-                        ? "text-purple-600"
-                        : "text-red-600"
-                    }`}
+                    className={`text-3xl font-bold ${readinessColorUtils.getTextClass(
+                      readinessScore.color
+                    )}`}
                   >
                     {breakdown.finalScore.toFixed(1)}%
                   </div>
@@ -312,17 +297,9 @@ const WellnessModal: React.FC<WellnessModalProps> = ({
               </CardHeader>
               <CardContent>
                 <div
-                  className={`p-4 rounded-lg ${
-                    readinessScore.color === "green"
-                      ? "bg-green-50 border border-green-200"
-                      : readinessScore.color === "yellow"
-                      ? "bg-yellow-50 border border-yellow-200"
-                      : readinessScore.color === "orange"
-                      ? "bg-orange-50 border border-orange-200"
-                      : readinessScore.color === "purple"
-                      ? "bg-purple-50 border border-purple-200"
-                      : "bg-red-50 border border-red-200"
-                  }`}
+                  className={`p-4 rounded-lg ${readinessColorUtils.getBackgroundClass(
+                    readinessScore.color
+                  )}`}
                 >
                   <div className="text-lg font-medium">
                     {readinessScore.status}
