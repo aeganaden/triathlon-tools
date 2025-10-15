@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { Card, Typography, InputNumber, Space, Divider } from "antd";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import styles from "./CarbMix.module.css";
-
-const { Title, Text } = Typography;
 
 /**
  * CarbMix tool
@@ -68,110 +69,129 @@ const CarbMix: React.FC = () => {
   }, [carbs, sodiumMg]);
 
   return (
-    <div>
-      <Title level={5} style={{ textAlign: "center" }}>
-        Carb Mix Measurement
-      </Title>
+    <div className="space-y-4">
+      <h2 className="text-lg font-medium text-center">Carb Mix Measurement</h2>
 
-      <Card style={{ marginBottom: 16 }}>
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <Text>Enter desired carbs (g):</Text>
-          <InputNumber
-            min={5}
-            step={5}
-            value={carbs}
-            onChange={(v) => setCarbs(typeof v === "number" ? v : 0)}
-            addonAfter="g carbs"
-          />
-          <Text>Optional: Desired sodium for whole mix (mg)</Text>
-          <InputNumber
-            min={0}
-            step={10}
-            value={sodiumMg}
-            onChange={(v) => setSodiumMg(typeof v === "number" ? v : 0)}
-            addonAfter="mg"
-          />
-          <Text type="secondary">
-            Base pouch = 30 g carbs. Results scale from that pouch.
-          </Text>
-        </Space>
-      </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardContent className="space-y-4 pt-6">
+            <div className="space-y-2">
+              <Label htmlFor="carbs">Enter desired carbs (g):</Label>
+              <Input
+                id="carbs"
+                type="number"
+                min="5"
+                step="5"
+                value={carbs}
+                onChange={(e) => setCarbs(parseInt(e.target.value) || 0)}
+                placeholder="Enter carbs in grams"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sodium">
+                Optional: Desired sodium for whole mix (mg)
+              </Label>
+              <Input
+                id="sodium"
+                type="number"
+                min="0"
+                step="10"
+                value={sodiumMg}
+                onChange={(e) => setSodiumMg(parseInt(e.target.value) || 0)}
+                placeholder="Enter sodium in mg"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Base pouch = 30 g carbs. Results scale from that pouch.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-2">
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <span className="font-semibold">Maltodextrin</span>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <span>{results.malt} g</span>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <span className="font-semibold">F60 fructose</span>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <span>{results.f60} g</span>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <span className="font-semibold">Lemon juice</span>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <span>{results.lemon} ml</span>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <span className="font-semibold">Water</span>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <span>{results.water} ml</span>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <span className="font-semibold">Sodium (requested)</span>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <span>{results.sodiumMg ?? 0} mg</span>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <span className="font-semibold">Salt (table) required</span>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <span>{results.saltG ?? 0} g</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator />
 
       <Card>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Maltodextrin</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.malt} g</Text>
-            </div>
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <span>Total Measurement (approx): </span>
+            <span className="font-semibold">{results.totalMl}</span>
+            <span className="text-lg ml-1">ml</span>
           </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>F60 fructose</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.f60} g</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Lemon juice</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.lemon} ml</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Water</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.water} ml</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Sodium (requested)</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.sodiumMg ?? 0} mg</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Salt (table) required</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.saltG ?? 0} g</Text>
-            </div>
-          </div>
-        </div>
+        </CardContent>
       </Card>
-
-      <Divider />
-
-      <Card title="Total Measurement (approx)">
-        <Text strong>{results.totalMl}</Text> <Text>ml</Text>
-      </Card>
-
-      <Divider />
-
       <Card>
-        <Text type="secondary">Scale factor:</Text>{" "}
-        <Text strong>{results.scale}</Text>
+        <CardContent className="pt-6">
+          <div className="text-center text-muted-foreground">
+            <span>Scale factor: </span>
+            <span className="font-semibold">{results.scale}</span>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

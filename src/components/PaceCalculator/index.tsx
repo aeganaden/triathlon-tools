@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Card, InputNumber, Typography, Space } from "antd";
-
-const { Title, Text } = Typography;
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const PaceCalculator: React.FC = () => {
   const [distanceKm, setDistanceKm] = useState<number>(5);
@@ -14,32 +14,45 @@ const PaceCalculator: React.FC = () => {
   }, [distanceKm, timeMin]);
 
   return (
-    <div>
-      <Title level={5} style={{ textAlign: "center" }}>
-        Pace Calculator
-      </Title>
+    <div className="space-y-4">
+      <h2 className="text-lg font-medium text-center">Pace Calculator</h2>
 
-      <Card style={{ marginBottom: 16 }}>
-        <Space direction="vertical">
-          <Text>Distance (km)</Text>
-          <InputNumber
-            min={0.1}
-            step={0.1}
-            value={distanceKm}
-            onChange={(v) => setDistanceKm(typeof v === "number" ? v : 0)}
-          />
-          <Text>Time (minutes)</Text>
-          <InputNumber
-            min={1}
-            step={1}
-            value={timeMin}
-            onChange={(v) => setTimeMin(typeof v === "number" ? v : 0)}
-          />
-        </Space>
+      <Card>
+        <CardContent className="space-y-4 pt-6">
+          <div className="space-y-2">
+            <Label htmlFor="distance">Distance (km)</Label>
+            <Input
+              id="distance"
+              type="number"
+              min="0.1"
+              step="0.1"
+              value={distanceKm}
+              onChange={(e) => setDistanceKm(parseFloat(e.target.value) || 0)}
+              placeholder="Enter distance in km"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="time">Time (minutes)</Label>
+            <Input
+              id="time"
+              type="number"
+              min="1"
+              step="1"
+              value={timeMin}
+              onChange={(e) => setTimeMin(parseInt(e.target.value) || 0)}
+              placeholder="Enter time in minutes"
+            />
+          </div>
+        </CardContent>
       </Card>
 
       <Card>
-        <Text strong>Pace:</Text> <Text>{pace} min/km</Text>
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <span className="font-semibold">Pace: </span>
+            <span className="text-lg">{pace} min/km</span>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

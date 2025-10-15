@@ -1,0 +1,28 @@
+{
+  "servers": {
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
+    },
+     "Intervals.icu": {
+      "command": "C:\\Users\\aeganaden\\.local\\bin\\uv.EXE",
+      "args": [
+        "run",
+        "--with",
+        "mcp[cli]",
+        "--with-editable",
+        "C:\\Users\\aeganaden\\development\\intervals-mcp-server",
+        "mcp",
+        "run",
+        "C:\\Users\\aeganaden\\development\\intervals-mcp-server\\src\\intervals_mcp_server\\server.py"
+      ],
+      "env": {
+        "API_KEY": "72yaj8jfnjlvjmsqke1xjcjxm",
+        "ATHLETE_ID": "i231285"
+      }
+    }
+  }
+}
