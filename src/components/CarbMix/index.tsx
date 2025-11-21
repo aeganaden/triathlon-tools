@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Card, Typography, InputNumber, Space, Divider } from "antd";
+import { Card, Typography, InputNumber, Space, Divider, Radio } from "antd";
 import styles from "./CarbMix.module.css";
 
 const { Title, Text } = Typography;
@@ -67,112 +67,368 @@ const CarbMix: React.FC = () => {
     };
   }, [carbs, sodiumMg]);
 
+  const [view, setView] = useState<"calculator" | "maurten">("calculator");
+
   return (
     <div>
       <Title level={5} style={{ textAlign: "center" }}>
         Carb Mix Measurement
       </Title>
 
-      <Card style={{ marginBottom: 16 }}>
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <Text>Enter desired carbs (g):</Text>
-          <InputNumber
-            min={5}
-            step={5}
-            value={carbs}
-            onChange={(v) => setCarbs(typeof v === "number" ? v : 0)}
-            addonAfter="g carbs"
-          />
-          <Text>Optional: Desired sodium for whole mix (mg)</Text>
-          <InputNumber
-            min={0}
-            step={10}
-            value={sodiumMg}
-            onChange={(v) => setSodiumMg(typeof v === "number" ? v : 0)}
-            addonAfter="mg"
-          />
-          <Text type="secondary">
-            Base pouch = 30 g carbs. Results scale from that pouch.
-          </Text>
-        </Space>
-      </Card>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}
+      >
+        <Radio.Group
+          value={view}
+          onChange={(e) => setView(e.target.value)}
+          optionType="button"
+          buttonStyle="solid"
+        >
+          <Radio.Button value="calculator">Carb mix calculator</Radio.Button>
+          <Radio.Button value="maurten">Maurten scaling guide</Radio.Button>
+        </Radio.Group>
+      </div>
 
-      <Card>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Maltodextrin</Text>
+      {view === "calculator" && (
+        <>
+          <Card style={{ marginBottom: 16 }}>
+            <Space direction="vertical" style={{ width: "100%" }}>
+              <Text>Enter desired carbs (g):</Text>
+              <InputNumber
+                min={5}
+                step={5}
+                value={carbs}
+                onChange={(v) => {
+                  if (typeof v !== "number") return;
+
+                  setCarbs(v);
+                }}
+                addonAfter="g carbs"
+              />
+              <Text>Optional: Desired sodium for whole mix (mg)</Text>
+              <InputNumber
+                min={0}
+                step={10}
+                value={sodiumMg}
+                onChange={(v) => {
+                  if (typeof v !== "number") return;
+
+                  setSodiumMg(v);
+                }}
+                addonAfter="mg"
+              />
+              <Text type="secondary">
+                Base pouch = 30 g carbs. Results scale from that pouch.
+              </Text>
+            </Space>
+          </Card>
+
+          <Card>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <Text strong>Maltodextrin</Text>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <Text>{results.malt} g</Text>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <Text strong>F60 fructose</Text>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <Text>{results.f60} g</Text>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <Text strong>Lemon juice</Text>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <Text>{results.lemon} ml</Text>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <Text strong>Water</Text>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <Text>{results.water} ml</Text>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <Text strong>Sodium (requested)</Text>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <Text>{results.sodiumMg ?? 0} mg</Text>
+                </div>
+              </div>
+
+              <div className={styles.tocLine}>
+                <div className={styles.label}>
+                  <Text strong>Salt (table) required</Text>
+                </div>
+                <div className={styles.filler} />
+                <div className={styles.value}>
+                  <Text>{results.saltG ?? 0} g</Text>
+                </div>
+              </div>
             </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.malt} g</Text>
-            </div>
+          </Card>
+
+          <Divider />
+
+          <Card title="Total Measurement (approx)">
+            <Text strong>{results.totalMl}</Text> <Text>ml</Text>
+          </Card>
+
+          <Divider />
+
+          <Card>
+            <Text type="secondary">Scale factor:</Text>{" "}
+            <Text strong>{results.scale}</Text>
+          </Card>
+        </>
+      )}
+
+      {view === "maurten" && (
+        <Card>
+          <Title level={5}>Scaling Guide</Title>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    Gels
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    Maltodextrin
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    F60
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    Gulaman
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    Water
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    Vanilla
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    Total Weight
+                  </th>
+                  <th
+                    style={{
+                      textAlign: "left",
+                      padding: 8,
+                      borderBottom: "1px solid #eee",
+                    }}
+                  >
+                    Total Carbs
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    1
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    10g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    15g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    1.4g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    24g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    2 drops
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    50.4g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    25g
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    3
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    30g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    45g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    4.2g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    72g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    6 drops
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    151.2g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    75g
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    5
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    50g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    75g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    7g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    120g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    10 drops
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    252g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    125g
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    10
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    100g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    150g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    14g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    240g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    20 drops
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    504g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    250g
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    15
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    150g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    225g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    21g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    360g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    30 drops
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    756g
+                  </td>
+                  <td style={{ padding: 8, borderBottom: "1px solid #fafafa" }}>
+                    375g
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: 8 }}>20</td>
+                  <td style={{ padding: 8 }}>200g</td>
+                  <td style={{ padding: 8 }}>300g</td>
+                  <td style={{ padding: 8 }}>28g</td>
+                  <td style={{ padding: 8 }}>480g</td>
+                  <td style={{ padding: 8 }}>40 drops</td>
+                  <td style={{ padding: 8 }}>1008g</td>
+                  <td style={{ padding: 8 }}>500g</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>F60 fructose</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.f60} g</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Lemon juice</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.lemon} ml</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Water</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.water} ml</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Sodium (requested)</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.sodiumMg ?? 0} mg</Text>
-            </div>
-          </div>
-
-          <div className={styles.tocLine}>
-            <div className={styles.label}>
-              <Text strong>Salt (table) required</Text>
-            </div>
-            <div className={styles.filler} />
-            <div className={styles.value}>
-              <Text>{results.saltG ?? 0} g</Text>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <Divider />
-
-      <Card title="Total Measurement (approx)">
-        <Text strong>{results.totalMl}</Text> <Text>ml</Text>
-      </Card>
-
-      <Divider />
-
-      <Card>
-        <Text type="secondary">Scale factor:</Text>{" "}
-        <Text strong>{results.scale}</Text>
-      </Card>
+        </Card>
+      )}
     </div>
   );
 };
