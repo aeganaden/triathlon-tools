@@ -197,7 +197,7 @@ const CarbMix: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Scaling Guide</CardTitle>
-              <CardDescription>Quick reference inspired by Maurten-style mixes.</CardDescription>
+              <CardDescription>Quick reference inspired by Maurten-style mixes</CardDescription>
             </CardHeader>
             <CardContent className="overflow-x-auto">
               <table className="w-full min-w-[640px] border-collapse text-sm">
