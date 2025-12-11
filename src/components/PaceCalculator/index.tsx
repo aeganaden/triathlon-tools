@@ -1,8 +1,12 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Card, InputNumber, Typography, Space } from "antd";
-
-const { Title, Text } = Typography;
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const PaceCalculator: React.FC = () => {
   const [distanceKm, setDistanceKm] = useState<number>(5);
@@ -13,33 +17,60 @@ const PaceCalculator: React.FC = () => {
     return Math.round((timeMin / distanceKm) * 100) / 100;
   }, [distanceKm, timeMin]);
 
-  return (
-    <div>
-      <Title level={5} style={{ textAlign: "center" }}>
-        Pace Calculator
-      </Title>
+  const handleNumberChange = (
+    setter: (value: number) => void,
+    fallback = 0
+  ) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = parseFloat(event.target.value);
+      setter(Number.isNaN(value) ? fallback : value);
+    };
 
-      <Card style={{ marginBottom: 16 }}>
-        <Space direction="vertical">
-          <Text>Distance (km)</Text>
-          <InputNumber
-            min={0.1}
-            step={0.1}
-            value={distanceKm}
-            onChange={(v) => setDistanceKm(typeof v === "number" ? v : 0)}
-          />
-          <Text>Time (minutes)</Text>
-          <InputNumber
-            min={1}
-            step={1}
-            value={timeMin}
-            onChange={(v) => setTimeMin(typeof v === "number" ? v : 0)}
-          />
-        </Space>
+  return (
+    <div className="space-y-4">
+      <div className="text-center">
+        <p className="text-lg font-semibold text-primary">Pace Calculator</p>
+      </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Inputs</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground" htmlFor="distance">
+              Distance (km)
+            </label>
+            <Input
+              id="distance"
+              type="number"
+              min={0.1}
+              step={0.1}
+              value={distanceKm}
+              onChange={handleNumberChange(setDistanceKm, 0.1)}
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground" htmlFor="time">
+              Time (minutes)
+            </label>
+            <Input
+              id="time"
+              type="number"
+              min={1}
+              step={1}
+              value={timeMin}
+              onChange={handleNumberChange(setTimeMin, 1)}
+            />
+          </div>
+        </CardContent>
       </Card>
 
       <Card>
-        <Text strong>Pace:</Text> <Text>{pace} min/km</Text>
+        <CardContent className="flex items-baseline gap-3">
+          <span className="text-sm font-medium text-muted-foreground">Pace</span>
+          <span className="text-3xl font-semibold">{pace} min/km</span>
+        </CardContent>
       </Card>
     </div>
   );

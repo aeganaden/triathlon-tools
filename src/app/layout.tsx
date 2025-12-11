@@ -1,8 +1,7 @@
-import React from "react";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
+import type { ReactNode } from "react";
 import "./globals.css";
 import { Noto_Sans_Display } from "next/font/google";
-import { ConfigProvider } from "antd";
+import { cn } from "@/lib/utils";
 
 const noto = Noto_Sans_Display({
   weight: ["300", "400", "700"],
@@ -14,29 +13,18 @@ export const metadata = {
   title: "Triathlon Tools",
 };
 
-const RootLayout = ({ children }: React.PropsWithChildren) => (
-  <html lang="en" className={noto.className}>
+const RootLayout = ({ children }: { children: ReactNode }) => (
+  <html lang="en" suppressHydrationWarning>
     <head>
       <title>Triathlon Tools</title>
     </head>
-    <body>
-      <AntdRegistry>
-        <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: "#054a91",
-              colorBgBase: "#dbe4ee",
-            },
-            components: {
-              Layout: {
-                headerBg: "#054a91",
-              },
-            },
-          }}
-        >
-          {children}
-        </ConfigProvider>
-      </AntdRegistry>
+    <body
+      className={cn(
+        "min-h-screen bg-background text-foreground antialiased",
+        noto.className
+      )}
+    >
+      {children}
     </body>
   </html>
 );

@@ -1,21 +1,55 @@
-/* Minimal CSS reset */
-/* Box sizing */
-:root, * , *::before, *::after {
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 33% 95%;
+  --foreground: 224 40% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 224 40% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 224 40% 12%;
+  --primary: 210 95% 29%;
+  --primary-foreground: 210 44% 96%;
+  --secondary: 214 31% 90%;
+  --secondary-foreground: 224 40% 18%;
+  --muted: 210 25% 92%;
+  --muted-foreground: 224 15% 37%;
+  --accent: 41 86% 58%;
+  --accent-foreground: 222 47% 12%;
+  --border: 214 31% 84%;
+  --input: 214 31% 84%;
+  --ring: 210 95% 29%;
+  --radius: 0.75rem;
 }
 
-html, body, #__next {
-  height: 100%;
+.dark {
+  --background: 224 36% 8%;
+  --foreground: 210 40% 96%;
+  --card: 224 36% 10%;
+  --card-foreground: 210 40% 96%;
+  --popover: 224 36% 8%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 210 95% 65%;
+  --primary-foreground: 210 55% 12%;
+  --secondary: 224 25% 15%;
+  --secondary-foreground: 210 40% 92%;
+  --muted: 224 20% 20%;
+  --muted-foreground: 214 16% 75%;
+  --accent: 210 40% 30%;
+  --accent-foreground: 210 40% 96%;
+  --border: 224 25% 20%;
+  --input: 224 25% 20%;
+  --ring: 210 95% 65%;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-}
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    @apply border-border;
+  }
 
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #ebebeb;
+  body {
+    @apply min-h-screen bg-background font-sans text-base text-foreground antialiased;
+  }
 }
- 

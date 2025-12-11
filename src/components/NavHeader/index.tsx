@@ -1,9 +1,7 @@
 "use client";
 import React from "react";
-import { Layout } from "antd";
 import { Funnel_Display } from "next/font/google";
-
-const { Header } = Layout;
+import { cn } from "@/lib/utils";
 
 const funnel = Funnel_Display({
   weight: ["400", "700"],
@@ -13,21 +11,15 @@ const funnel = Funnel_Display({
 
 const NavHeader: React.FC = () => {
   return (
-    <Header
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 16,
-      }}
-    >
-      <div
-        className={`funnel-display ${funnel.className}`}
-        style={{ fontWeight: 700, fontSize: 18, color: "#ebebeb" }}
-      >
-        Triathlon Tools
+    <header className="bg-primary text-primary-foreground shadow-sm">
+      <div className="mx-auto flex max-w-5xl items-center justify-center gap-4 px-4 py-6">
+        <div
+          className={cn("text-lg font-bold uppercase tracking-[0.2em]", funnel.className)}
+        >
+          Triathlon Tools
+        </div>
       </div>
-    </Header>
+    </header>
   );
 };
 
