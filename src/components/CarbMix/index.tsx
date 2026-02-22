@@ -24,7 +24,8 @@ import styles from "./CarbMix.module.css";
 const BASE_CARBS = 30; // g carbs per pouch
 const BASE_MALT = 13.4; // g per pouch
 const BASE_F60 = 16.6; // g per pouch
-const BASE_LEMON = 5.7; // ml per pouch
+// Approximate citric acid equivalent for 5.7 ml lemon juice (~5% citric acid)
+const BASE_CITRIC = 0.29; // g citric acid per pouch
 const BASE_WATER = 28.7; // ml per pouch (adjusted)
 function round(v: number) {
   return Math.round(v * 100) / 100;
@@ -52,11 +53,11 @@ const CarbMix: React.FC = () => {
 
     const malt = BASE_MALT * scale;
     const f60 = BASE_F60 * scale;
-    const lemon = BASE_LEMON * scale;
+    const citric = BASE_CITRIC * scale;
     const waterBase = BASE_WATER * scale;
 
     // Approximate solids volume by treating grams ~= ml
-    const solidsVolume = malt + f60; // ml approximation
+    const solidsVolume = malt + f60 + citric; // ml approximation
 
     // Convert sodium (mg) to table salt (NaCl) amount.
     // Na atomic mass = 22.98976928, Cl = 35.453 -> Na fraction of NaCl by mass:
@@ -68,13 +69,13 @@ const CarbMix: React.FC = () => {
     const saltG = saltTotalMg / 1000;
     const saltMl = saltG; // 1 g ~= 1 ml approximation
 
-    // Total ml yield ~= solidsVolume + lemon + waterBase + saltMl
-    const totalMl = solidsVolume + lemon + waterBase + saltMl;
+    // Total ml yield ~= solidsVolume (including citric acid) + waterBase + saltMl
+    const totalMl = solidsVolume + waterBase + saltMl;
 
     return {
       malt: round(malt),
       f60: round(f60),
-      lemon: round(lemon),
+      citric: round(citric),
       water: round(waterBase),
       // saltMg is the computed table salt (NaCl) in mg
       saltMg: Math.round(saltTotalMg * 100) / 100,
@@ -90,7 +91,7 @@ const CarbMix: React.FC = () => {
   const breakdown = [
     { label: "Maltodextrin", value: `${results.malt} g` },
     { label: "F60 fructose", value: `${results.f60} g` },
-    { label: "Lemon juice", value: `${results.lemon} ml` },
+    { label: "Citric acid", value: `${results.citric} g` },
     { label: "Water", value: `${results.water} ml` },
     { label: "Sodium (requested)", value: `${results.sodiumMg ?? 0} mg` },
     { label: "Salt (table) required", value: `${results.saltG ?? 0} g` },
